@@ -8,6 +8,8 @@ class GameEngine:
         self.height = height
         self.secret_number = random.randint(1, 100)
         self.attempts = 0
+        self.min_val = 1
+        self.max_val = 100
         self.feedback_msg = "Enter a number between 1 and 100"
         self.feedback_color = (220, 220, 220)
         self.game_won = False
@@ -34,9 +36,11 @@ class GameEngine:
         self.input_box.clear()
 
         if guess < self.secret_number:
+            self.min_val = max(self.min_val, guess + 1)
             self.feedback_msg = f"TOO LOW! (Guess was {guess})"
             self.feedback_color = (80, 160, 240)
         elif guess > self.secret_number:
+            self.max_val = min(self.max_val, guess - 1)
             self.feedback_msg = f"TOO HIGH! (Guess was {guess})"
             self.feedback_color = (240, 100, 80)
         else:
@@ -47,6 +51,8 @@ class GameEngine:
     def reset(self):
         self.secret_number = random.randint(1, 100)
         self.attempts = 0
+        self.min_val = 1
+        self.max_val = 100
         self.feedback_msg = "Enter a number between 1 and 100"
         self.feedback_color = (220, 220, 220)
         self.game_won = False
@@ -75,7 +81,11 @@ class GameEngine:
         screen.blit(title_surf, (self.width // 2 - title_surf.get_width() // 2, 35))
 
         attempts_surf = self.font_medium.render(f"Attempts: {self.attempts}", True, (180, 185, 195))
-        screen.blit(attempts_surf, (self.width // 2 - attempts_surf.get_width() // 2, 95))
+        screen.blit(attempts_surf, (self.width // 2 - attempts_surf.get_width() // 2, 80))
+
+        range_surf = self.font_medium.render(f"Current Range: {self.min_val} - {self.max_val}", True, (180, 185, 195))
+        screen.blit(range_surf, (self.width // 2 - range_surf.get_width() // 2, 112))
+
         self.input_box.render(screen)
 
         pygame.draw.rect(screen, (50, 150, 80), self.submit_btn, border_radius=6)
@@ -92,3 +102,19 @@ class GameEngine:
         if self.game_won:
             restart_surf = self.font_medium.render("Press [R] to Start a New Game", True, (255, 220, 80))
             screen.blit(restart_surf, (self.width // 2 - restart_surf.get_width() // 2, 295))
+
+    @property
+    def min_range(self):
+        return self.min_val
+
+    @min_range.setter
+    def min_range(self, val):
+        self.min_val = val
+
+    @property
+    def max_range(self):
+        return self.max_val
+
+    @max_range.setter
+    def max_range(self, val):
+        self.max_val = val
